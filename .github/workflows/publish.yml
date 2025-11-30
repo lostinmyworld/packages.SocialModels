@@ -27,7 +27,7 @@ jobs:
           NUGET_AUTH_TOKEN: ${{ secrets.NUGET_TOKEN }}
 
       - name: Pack
-        run: dotnet pack --configuration Release
+        run: dotnet pack SocialModels/SocialModels.csproj --configuration Release
 
       - name: Push
         run: dotnet nuget push "SocialModels/bin/Release/*.nupkg" --source "${{ env.NUGET_SOURCE_URL }}" --api-key ${{ env.NUGET_AUTH_TOKEN }} --skip-duplicate
