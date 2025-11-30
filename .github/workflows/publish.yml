@@ -30,4 +30,4 @@ jobs:
         run: dotnet pack --configuration Release
 
       - name: Push
-        run: dotnet nuget push "packages.SocialModels/bin/Release/*.nupkg" --source "${{ env.NUGET_SOURCE_URL }}" --api-key ${{ env.NUGET_AUTH_TOKEN }} --skip-duplicate
+        run: dotnet nuget push "SocialModels/bin/Release/*.nupkg" --source "${{ env.NUGET_SOURCE_URL }}" --api-key ${{ env.NUGET_AUTH_TOKEN }} --skip-duplicate
