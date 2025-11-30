@@ -1,0 +1,33 @@
+name: Publish to GitHub Packages
+
+on:
+  push:
+    branches: [ main ]
+
+env:
+  NUGET_SOURCE_URL: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write # Required to push the package
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.x"
+          # specific URL required for auth
+          source-url: ${{ env.NUGET_SOURCE_URL }}
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.NUGET_TOKEN }}
+
+      - name: Pack
+        run: dotnet pack --configuration Release
+
+      - name: Push
+        run: dotnet nuget push "packages.SocialModels/bin/Release/*.nupkg" --source "${{ env.NUGET_SOURCE_URL }}" --api-key ${{ env.NUGET_AUTH_TOKEN }} --skip-duplicate
