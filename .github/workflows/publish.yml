@@ -10,7 +10,7 @@ jobs:
     permissions:
       contents: read
       packages: write
-      
+
     steps:
       - uses: actions/checkout@v4
 
@@ -26,4 +26,4 @@ jobs:
         run: dotnet pack SocialModels/SocialModels.csproj --configuration Release
 
       - name: Push
-        run: dotnet nuget push "SocialModels/bin/Release/*.nupkg" --source "https://nuget.pkg.github.com/lostinmyworld/index.json" --api-key ${{ env.NUGET_AUTH_TOKEN }} --skip-duplicate
+        run: dotnet nuget push "SocialModels/bin/Release/*.nupkg" --source "https://nuget.pkg.github.com/lostinmyworld/index.json" --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
