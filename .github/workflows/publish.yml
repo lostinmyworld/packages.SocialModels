@@ -4,8 +4,7 @@ on:
   push:
     branches: [ main ]
 env:
-  VERSION_PREFIX: "0.2" 
-  NUGET_SOURCE_URL: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+  VERSION_PREFIX: "0.2"
 
 jobs:
   publish:
@@ -21,10 +20,10 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "10.x"
-          source-url: ${{ env.NUGET_SOURCE_URL }}
+          source-url: "https://nuget.pkg.github.com/lostinmyworld/index.json"
 
       - name: Build and Pack with Versioning
         run: dotnet build SocialModels/SocialModels.csproj --configuration Release /p:Version=${{ env.VERSION_PREFIX }}.${{ github.run_number }}
       
       - name: Push
-        run: dotnet nuget push "SocialModels/bin/Release/*.nupkg" --source ${{ env.NUGET_SOURCE_URL }} --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
+        run: dotnet nuget push "SocialModels/bin/Release/*.nupkg" --source "https://nuget.pkg.github.com/lostinmyworld/index.json" --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
