@@ -19,6 +19,8 @@ jobs:
         with:
           dotnet-version: "10.x"
           source-url: "https://nuget.pkg.github.com/lostinmyworld/index.json"
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Pack
         run: dotnet pack SocialModels/SocialModels.csproj --configuration Release
