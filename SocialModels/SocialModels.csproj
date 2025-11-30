@@ -5,7 +5,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         
-        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+        <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
         <AssemblyName>packages.SocialModels</AssemblyName>
         <PackageId>packages.SocialModels</PackageId>
         <Authors>lostinmyworld</Authors>
