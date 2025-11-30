@@ -9,8 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write # Required to push the package
-
+      packages: write
+      
     steps:
       - uses: actions/checkout@v4
 
@@ -18,7 +18,6 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "10.x"
-          # specific URL required for auth
           source-url: "https://nuget.pkg.github.com/lostinmyworld/index.json"
         env:
           NUGET_AUTH_TOKEN: ${{ secrets.NUGET_TOKEN }}
