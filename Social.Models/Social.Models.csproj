@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        
+        <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+        <AssemblyName>packages.Social.Models</AssemblyName>
+        <PackageId>packages.Social.Models</PackageId>
+        <Authors>lostinmyworld</Authors>
+        <Title>Social Models to be used from other projects.</Title>
+        <Version>1.0.0</Version>
+        <RepositoryUrl>https://github.com/lostinmyworld/packages.SocialModels</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+    </PropertyGroup>
+
+</Project>

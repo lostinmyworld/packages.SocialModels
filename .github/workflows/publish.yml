@@ -10,6 +10,8 @@ jobs:
     permissions:
       contents: read
       packages: write
+    env:
+      NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - uses: actions/checkout@v4
@@ -19,11 +21,15 @@ jobs:
         with:
           dotnet-version: "10.x"
           source-url: "https://nuget.pkg.github.com/lostinmyworld/index.json"
-        env:
-          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Pack
-        run: dotnet pack SocialModels/SocialModels.csproj --configuration Release
+        run: |
+          dotnet pack Social.Models/Social.Models.csproj --configuration Release
+          dotnet pack Social.Overthinkers/Social.Overthinkers.csproj --configuration Release
+          dotnet pack Social.Oversharers/Social.Oversharers.csproj --configuration Release
 
       - name: Push
-        run: dotnet nuget push "SocialModels/bin/Release/*.nupkg" --source "https://nuget.pkg.github.com/lostinmyworld/index.json" --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
+        run: |
+          dotnet nuget push Social.Models/bin/Release/*.nupkg --source "https://nuget.pkg.github.com/lostinmyworld/index.json" --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
+          dotnet nuget push Social.Overthinkers/bin/Release/*.nupkg --source "https://nuget.pkg.github.com/lostinmyworld/index.json" --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
+          dotnet nuget push Social.Oversharers/bin/Release/*.nupkg --source "https://nuget.pkg.github.com/lostinmyworld/index.json" --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate

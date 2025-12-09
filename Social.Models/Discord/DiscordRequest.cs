@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace SocialModels;
+namespace Social.Models.Discord;
 
 public class DiscordRequest
 {

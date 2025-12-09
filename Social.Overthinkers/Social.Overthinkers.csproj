@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+        <AssemblyName>packages.Social.Overthinkers</AssemblyName>
+        <PackageId>packages.Social.Overthinkers</PackageId>
+        <Authors>lostinmyworld</Authors>
+        <Title>Parsers and helper classes to parse social media models.</Title>
+        <Version>0.0.1</Version>
+        <RepositoryUrl>https://github.com/lostinmyworld/packages.SocialModels</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Social.Models\Social.Models.csproj" />
+    </ItemGroup>
+
+</Project>

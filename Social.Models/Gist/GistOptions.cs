@@ -1,4 +1,4 @@
-﻿namespace SocialModels;
+﻿namespace Social.Models.Gist;
 
 public class GistOptions
 {
