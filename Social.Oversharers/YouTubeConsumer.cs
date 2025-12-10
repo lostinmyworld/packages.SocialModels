@@ -1,21 +1,21 @@
-﻿using Social.Models.YouTube;
-using Social.Overthinkers;
+﻿using Social.Models;
+using Social.Models.YouTube;
+using Social.Overthinkers.Abstractions;
 
 namespace Social.Oversharers;
 
-public class YouTubeConsumer(HttpClient httpClient)
+public class YouTubeConsumer(IYouTubeParser _youTubeParser, IHttpClientFactory _httpClientFactory)
 {
-    private const string BaseUrl = "https://www.youtube.com/feeds/videos.xml?channel_id={channelId}";
-
     public async Task<YouTubeFeed?> GetFeedAsync(string channelId)
     {
-        var url = BaseUrl.Replace("channelId", channelId);
+        var url = Endpoints.YouTubeRssUrl.Replace("channelId", channelId);
 
         try
         {
+            using var httpClient = _httpClientFactory.CreateClient(nameof(YouTubeConsumer));
             var xml = await httpClient.GetStringAsync(url);
 
-            return YouTubeParser.DeserializeFeed(xml);
+            return _youTubeParser.DeserializeFeed(xml);
         }
         catch (Exception ex)
         {

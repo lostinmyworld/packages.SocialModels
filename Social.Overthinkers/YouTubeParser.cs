@@ -1,11 +1,12 @@
 ﻿using System.Xml.Serialization;
 using Social.Models.YouTube;
+using Social.Overthinkers.Abstractions;
 
 namespace Social.Overthinkers;
 
-public static class YouTubeParser
+public class YouTubeParser : IYouTubeParser
 {
-    public static YouTubeFeed? DeserializeFeed(string xml)
+    public YouTubeFeed? DeserializeFeed(string xml)
     {
         var serializer = new XmlSerializer(typeof(YouTubeFeed));
         using var reader = new StringReader(xml);
