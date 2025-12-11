@@ -5,7 +5,7 @@ namespace Social.Overthinkers.Extensions;
 
 public static class BootstrappingExtensions
 {
-    public static IServiceCollection AddSocialOverSharers(this IServiceCollection services)
+    public static IServiceCollection AddSocialOverThinkers(this IServiceCollection services)
     {
         ArgumentNullException.ThrowIfNull(services);
 
