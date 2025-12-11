@@ -1,8 +1,8 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Social.Models;
+namespace Social.Models.Instagram;
 
-public class Post
+public class InstagramPost
 {
     [JsonPropertyName("id")]
     public string Id { get; set; } = default!;

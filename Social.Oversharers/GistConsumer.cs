@@ -31,7 +31,7 @@ public class GistConsumer : IGistConsumer
         _httpClientFactory = httpClientFactory;
     }
 
-    public async Task<LastState> LoadPreviousStateAsync(SocialMedia socialMedia)
+    public async Task<LastState> LoadPreviousState(SocialMedia socialMedia)
     {
         Console.WriteLine("Retrieving state...");
 
@@ -80,7 +80,7 @@ public class GistConsumer : IGistConsumer
         return new();
     }
 
-    public async Task SaveCurrentStateAsync(LastState state, SocialMedia socialMedia)
+    public async Task SaveCurrentState(LastState state, SocialMedia socialMedia)
     {
         Console.WriteLine("Saving state...");
 

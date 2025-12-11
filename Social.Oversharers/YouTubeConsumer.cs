@@ -1,14 +1,29 @@
 ﻿using Social.Models;
 using Social.Models.YouTube;
+using Social.Oversharers.Abstractions;
 using Social.Overthinkers.Abstractions;
 
 namespace Social.Oversharers;
 
-public class YouTubeConsumer(IYouTubeParser _youTubeParser, IHttpClientFactory _httpClientFactory)
+public class YouTubeConsumer : IYouTubeConsumer
 {
-    public async Task<YouTubeFeed?> GetFeedAsync(string channelId)
+    private readonly IYouTubeParser _youTubeParser;
+    private readonly IHttpClientFactory _httpClientFactory;
+
+    public YouTubeConsumer(
+        IYouTubeParser youTubeParser,
+        IHttpClientFactory httpClientFactory)
     {
-        var url = Endpoints.YouTubeRssUrl.Replace("channelId", channelId);
+        ArgumentNullException.ThrowIfNull(youTubeParser);
+        ArgumentNullException.ThrowIfNull(httpClientFactory);
+
+        _youTubeParser = youTubeParser;
+        _httpClientFactory = httpClientFactory;
+    }
+
+    public async Task<YouTubeFeed?> RetrieveFeed(string channelId)
+    {
+        var url = Endpoints.YouTubeRssUrl.Replace("{channelId}", channelId);
 
         try
         {

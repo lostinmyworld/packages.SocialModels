@@ -5,7 +5,7 @@ namespace Social.Oversharers.Abstractions;
 
 public interface IGistConsumer
 {
-    Task<LastState> LoadPreviousStateAsync(SocialMedia socialMedia);
+    Task<LastState> LoadPreviousState(SocialMedia socialMedia);
 
-    Task SaveCurrentStateAsync(LastState state, SocialMedia socialMedia);
+    Task SaveCurrentState(LastState state, SocialMedia socialMedia);
 }

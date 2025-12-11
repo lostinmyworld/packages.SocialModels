@@ -11,7 +11,13 @@ public static class BootstrappingExtensions
 
         services.AddSingleton<IEnvironmentLoader, EnvironmentLoader>();
         services.AddSingleton<IGistConsumer, GistConsumer>();
+        services.AddSingleton<IYouTubeConsumer, YouTubeConsumer>();
+        services.AddSingleton<IInstagramConsumer, InstagramConsumer>();
+        services.AddSingleton<IDiscordSharer, DiscordSharer>();
+
         services.AddHttpClient<YouTubeConsumer>();
+        services.AddHttpClient<InstagramConsumer>();
+        services.AddHttpClient<DiscordSharer>();
 
         return services;
     }

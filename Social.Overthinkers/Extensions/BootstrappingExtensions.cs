@@ -10,6 +10,7 @@ public static class BootstrappingExtensions
         ArgumentNullException.ThrowIfNull(services);
 
         services.AddSingleton<IYouTubeParser, YouTubeParser>();
+        services.AddSingleton<IInstagramParser, InstagramParser>();
 
         return services;
     }
