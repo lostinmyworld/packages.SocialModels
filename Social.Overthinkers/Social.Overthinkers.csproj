@@ -9,7 +9,7 @@
         <PackageId>packages.Social.Overthinkers</PackageId>
         <Authors>lostinmyworld</Authors>
         <Title>Parsers and helper classes to parse social media models.</Title>
-        <Version>0.0.4</Version>
+        <Version>0.0.5</Version>
         <RepositoryUrl>https://github.com/lostinmyworld/packages.SocialModels</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
     </PropertyGroup>

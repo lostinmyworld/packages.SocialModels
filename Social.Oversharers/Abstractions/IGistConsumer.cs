@@ -5,7 +5,14 @@ namespace Social.Oversharers.Abstractions;
 
 public interface IGistConsumer
 {
-    Task<LastState> LoadPreviousState(SocialMedia socialMedia);
+    Task<LastState> LoadPreviousState(GistOptions options);
+    Task<LastState> LoadPreviousState(
+        SocialGistOptions socialGistOptions,
+        SocialMedia socialMedia);
 
-    Task SaveCurrentState(LastState state, SocialMedia socialMedia);
+    Task SaveCurrentState(LastState state, GistOptions options);
+    Task SaveCurrentState(
+        LastState state,
+        SocialGistOptions socialGistOptions,
+        SocialMedia socialMedia);
 }
