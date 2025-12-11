@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="../Social.Oversharers/Social.Oversharers.csproj" Id="d7344c08-9f0b-4dff-abb7-604d539c7cb3" />
   <Project Path="../Social.Overthinkers/Social.Overthinkers.csproj" Id="23d7fb04-75e3-42d2-852b-e60ccaab0a98" />
+  <Project Path="../Test/Test.csproj" Id="5f872f1c-02b3-4665-b94f-74a74f0700ae" />
   <Project Path="Social.Models.csproj" />
 </Solution>

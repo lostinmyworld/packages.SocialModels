@@ -27,13 +27,16 @@ public class GistConsumer : IGistConsumer
         _httpClientFactory = httpClientFactory;
     }
 
-    public async Task<LastState> LoadPreviousState(GistOptions options)
+    public async Task<LastState> LoadPreviousState(
+        GistOptions options,
+        string userAgent = "Social.OverSharers")
     {
         Console.WriteLine("Retrieving state...");
 
         var requestUri = Endpoints.GithubGistApiUri.Replace("{gistId}", options.GistId);
         using var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
         request.Headers.Authorization = new("Bearer", options.GistToken);
+        request.Headers.UserAgent.ParseAdd(userAgent);
 
         using var httpClient = _httpClientFactory.CreateClient();
         using var response = await httpClient.SendAsync(request);
@@ -70,7 +73,8 @@ public class GistConsumer : IGistConsumer
 
     public async Task<LastState> LoadPreviousState(
         SocialGistOptions socialGistOptions,
-        SocialMedia socialMedia)
+        SocialMedia socialMedia,
+        string userAgent = "Social.OverSharers")
     {
         Console.WriteLine("Retrieving state...");
 
@@ -85,6 +89,7 @@ public class GistConsumer : IGistConsumer
         var requestUri = Endpoints.GithubGistApiUri.Replace("{gistId}", options.GistId);
         using var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
         request.Headers.Authorization = new("Bearer", options.GistToken);
+        request.Headers.UserAgent.ParseAdd(userAgent);
 
         using var httpClient = _httpClientFactory.CreateClient();
         using var response = await httpClient.SendAsync(request);
@@ -119,7 +124,10 @@ public class GistConsumer : IGistConsumer
         return new();
     }
 
-    public async Task SaveCurrentState(LastState state, GistOptions options)
+    public async Task SaveCurrentState(
+        LastState state,
+        GistOptions options,
+        string userAgent = "Social.OverSharers")
     {
         Console.WriteLine("Saving state...");
 
@@ -144,6 +152,7 @@ public class GistConsumer : IGistConsumer
             Content = new StringContent(json, Encoding.UTF8, MediaTypeNames.Application.Json)
         };
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", options.GistToken);
+        request.Headers.UserAgent.ParseAdd(userAgent);
 
         using var httpClient = _httpClientFactory.CreateClient();
         using var response = await httpClient.SendAsync(request);
@@ -155,7 +164,8 @@ public class GistConsumer : IGistConsumer
     public async Task SaveCurrentState(
         LastState state,
         SocialGistOptions socialGistOptions,
-        SocialMedia socialMedia)
+        SocialMedia socialMedia,
+        string userAgent = "Social.OverSharers")
     {
         Console.WriteLine("Saving state...");
 
@@ -188,6 +198,7 @@ public class GistConsumer : IGistConsumer
             Content = new StringContent(json, Encoding.UTF8, MediaTypeNames.Application.Json)
         };
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", options.GistToken);
+        request.Headers.UserAgent.ParseAdd(userAgent);
 
         using var httpClient = _httpClientFactory.CreateClient();
         using var response = await httpClient.SendAsync(request);
