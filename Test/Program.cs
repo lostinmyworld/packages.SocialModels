@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Social.Models.Gist;
+using Social.Models.Instagram;
 using Social.Oversharers.Abstractions;
 using Social.Oversharers.Extensions;
 using Social.Overthinkers.Extensions;
@@ -17,6 +18,7 @@ Console.WriteLine("Getting dependencies...");
 
 var environmentLoader = serviceProvider.GetRequiredService<IEnvironmentLoader>();
 var gistConsumer = serviceProvider.GetRequiredService<IGistConsumer>();
+var instaConsumer = serviceProvider.GetRequiredService<IInstagramConsumer>();
 
 Console.WriteLine("Getting envitonment variables...");
 
@@ -31,5 +33,11 @@ var gistOptions = environmentLoader.LoadGistOptions(gistOptionsToRetrieve);
 Console.WriteLine("Getting Gist State...");
 
 var state = await gistConsumer.LoadPreviousState(gistOptions!, "test");
+
+var instagramToken = Environment.GetEnvironmentVariable("IG_ACCESS_TOKEN");
+
+var instaRequest = new InstagramRequest(instagramToken, "insta-watchdog/1.0", HowManyPostsToFetch: 20);
+
+var instaData = await instaConsumer.RetrievePostsAsync(instaRequest);
 
 Console.WriteLine("Test success!");
