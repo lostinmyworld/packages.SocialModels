@@ -7,4 +7,6 @@ public static class Endpoints
     public const string GithubGistApiUri = "https://api.github.com/gists/{gistId}";
 
     public const string YouTubeRssUrl = "https://www.youtube.com/feeds/videos.xml?channel_id={channelId}";
+
+    public const string TwitterV2QueryUrl = "https://api.twitter.com/2/tweets";
 }

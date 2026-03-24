@@ -36,7 +36,7 @@ var state = await gistConsumer.LoadPreviousState(gistOptions!, "test");
 
 var instagramToken = Environment.GetEnvironmentVariable("IG_ACCESS_TOKEN");
 
-var instaRequest = new InstagramRequest(instagramToken, "insta-watchdog/1.0", HowManyPostsToFetch: 20);
+var instaRequest = new InstagramRequest(instagramToken!, "insta-watchdog/1.0", HowManyPostsToFetch: 20);
 
 var instaData = await instaConsumer.RetrievePostsAsync(instaRequest);
 

@@ -1,8 +1,5 @@
-﻿using System.Net.Http.Headers;
-using System.Net.Mime;
-using System.Text;
-using System.Text.Json;
-using Social.Models;
+﻿using System.Text.Json;
+using Octokit;
 using Social.Models.Enums;
 using Social.Models.Gist;
 using Social.Oversharers.Abstractions;
@@ -11,7 +8,7 @@ namespace Social.Oversharers;
 
 public class GistConsumer : IGistConsumer
 {
-    private readonly IHttpClientFactory _httpClientFactory;
+    private const string DefaultUserAgent = "Social.OverSharers";
 
     private static readonly JsonSerializerOptions _jsonOptions = new()
     {
@@ -19,192 +16,105 @@ public class GistConsumer : IGistConsumer
         AllowTrailingCommas = true,
     };
 
-    public GistConsumer(
-        IHttpClientFactory httpClientFactory)
-    {
-        ArgumentNullException.ThrowIfNull(httpClientFactory);
-
-        _httpClientFactory = httpClientFactory;
-    }
-
-    public async Task<LastState> LoadPreviousState(
+    public Task<LastState> LoadPreviousState(
         GistOptions options,
-        string userAgent = "Social.OverSharers")
+        string userAgent = DefaultUserAgent)
     {
-        Console.WriteLine("Retrieving state...");
-
-        var requestUri = Endpoints.GithubGistApiUri.Replace("{gistId}", options.GistId);
-        using var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
-        request.Headers.Authorization = new("Bearer", options.GistToken);
-        request.Headers.UserAgent.ParseAdd(userAgent);
-
-        using var httpClient = _httpClientFactory.CreateClient();
-        using var response = await httpClient.SendAsync(request);
-        response.EnsureSuccessStatusCode();
-
-        var json = await response.Content.ReadAsStringAsync();
-        var gistResponse = JsonSerializer.Deserialize<GistResponse>(json, _jsonOptions);
-
-        if (gistResponse?.Files is null
-            || gistResponse.Files.Count == 0
-            || !gistResponse.Files.TryGetValue(options.GistStateFileName, out var stateFile)
-            || string.IsNullOrWhiteSpace(stateFile.Content))
-        {
-            return new();
-        }
-
-        try
-        {
-            var lastState = JsonSerializer.Deserialize<LastState>(stateFile.Content, _jsonOptions);
-            if (lastState is null)
-            {
-                return new();
-            }
-
-            return lastState;
-        }
-        catch (JsonException ex)
-        {
-            await Console.Error.WriteLineAsync($"Failed to deserialize state from Gist with message {ex.Message}.");
-        }
-
-        return new();
+        return LoadStateInternal(options, userAgent);
     }
 
     public async Task<LastState> LoadPreviousState(
         SocialGistOptions socialGistOptions,
         SocialMedia socialMedia,
-        string userAgent = "Social.OverSharers")
+        string userAgent = DefaultUserAgent)
     {
-        Console.WriteLine("Retrieving state...");
-
-        var gistExistForSocial = socialGistOptions.GistPerSocial.TryGetValue(socialMedia, out var options);
-        if (!gistExistForSocial || options is null)
+        if (!socialGistOptions.GistPerSocial.TryGetValue(socialMedia, out var options)
+            || options is null)
         {
-            Console.WriteLine($"Gist not found for social: {socialMedia}...");
-
+            Console.WriteLine($"Gist not found for social: {socialMedia}.");
             return new();
         }
 
-        var requestUri = Endpoints.GithubGistApiUri.Replace("{gistId}", options.GistId);
-        using var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
-        request.Headers.Authorization = new("Bearer", options.GistToken);
-        request.Headers.UserAgent.ParseAdd(userAgent);
-
-        using var httpClient = _httpClientFactory.CreateClient();
-        using var response = await httpClient.SendAsync(request);
-        response.EnsureSuccessStatusCode();
-
-        var json = await response.Content.ReadAsStringAsync();
-        var gistResponse = JsonSerializer.Deserialize<GistResponse>(json, _jsonOptions);
-
-        if (gistResponse?.Files is null
-            || gistResponse.Files.Count == 0
-            || !gistResponse.Files.TryGetValue(options.GistStateFileName, out var stateFile)
-            || string.IsNullOrWhiteSpace(stateFile.Content))
-        {
-            return new();
-        }
-
-        try
-        {
-            var lastState = JsonSerializer.Deserialize<LastState>(stateFile.Content, _jsonOptions);
-            if (lastState is null)
-            {
-                return new();
-            }
-
-            return lastState;
-        }
-        catch (JsonException ex)
-        {
-            await Console.Error.WriteLineAsync($"Failed to deserialize state from Gist with message {ex.Message}.");
-        }
-
-        return new();
+        return await LoadStateInternal(options, userAgent);
     }
 
-    public async Task SaveCurrentState(
+    public Task SaveCurrentState(
         LastState state,
         GistOptions options,
-        string userAgent = "Social.OverSharers")
+        string userAgent = DefaultUserAgent)
     {
-        Console.WriteLine("Saving state...");
-
-        var stateJson = JsonSerializer.Serialize(state, _jsonOptions);
-
-        var payload = new GistResponse
-        {
-            Files = new()
-            {
-                [options.GistStateFileName] = new()
-                {
-                    Content = stateJson
-                }
-            }
-        };
-
-        var json = JsonSerializer.Serialize(payload, _jsonOptions);
-
-        var requestUri = Endpoints.GithubGistApiUri.Replace("{gistId}", options.GistId);
-        using var request = new HttpRequestMessage(HttpMethod.Patch, requestUri)
-        {
-            Content = new StringContent(json, Encoding.UTF8, MediaTypeNames.Application.Json)
-        };
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", options.GistToken);
-        request.Headers.UserAgent.ParseAdd(userAgent);
-
-        using var httpClient = _httpClientFactory.CreateClient();
-        using var response = await httpClient.SendAsync(request);
-
-        response.EnsureSuccessStatusCode();
-
-        Console.WriteLine("State saved successfully.");
+        return SaveStateInternal(state, options, userAgent);
     }
+
     public async Task SaveCurrentState(
         LastState state,
         SocialGistOptions socialGistOptions,
         SocialMedia socialMedia,
-        string userAgent = "Social.OverSharers")
+        string userAgent = DefaultUserAgent)
     {
-        Console.WriteLine("Saving state...");
-
-        var gistExistForSocial = socialGistOptions.GistPerSocial.TryGetValue(socialMedia, out var options);
-        if (!gistExistForSocial || options is null)
+        if (!socialGistOptions.GistPerSocial.TryGetValue(socialMedia, out var options)
+            || options is null)
         {
             Console.WriteLine($"Gist not found for social: {socialMedia}...");
-
             return;
         }
 
-        var stateJson = JsonSerializer.Serialize(state, _jsonOptions);
+        await SaveStateInternal(state, options, userAgent);
+    }
 
-        var payload = new GistResponse
+    #region private helpers
+    private static async Task<LastState> LoadStateInternal(GistOptions options, string userAgent)
+    {
+        Console.WriteLine("Retrieving state...");
+        try
         {
-            Files = new()
+            var client = GetGitHubClient(options.GistToken, userAgent);
+            var gist = await client.Gist.Get(options.GistId);
+
+            if (gist.Files is not null
+                && gist.Files.TryGetValue(options.GistStateFileName, out var stateFile)
+                && !string.IsNullOrWhiteSpace(stateFile?.Content))
             {
-                [options.GistStateFileName] = new()
-                {
-                    Content = stateJson
-                }
+                return JsonSerializer.Deserialize<LastState>(stateFile.Content, _jsonOptions)
+                    ?? new();
             }
-        };
-
-        var json = JsonSerializer.Serialize(payload, _jsonOptions);
-
-        var requestUri = Endpoints.GithubGistApiUri.Replace("{gistId}", options.GistId);
-        using var request = new HttpRequestMessage(HttpMethod.Patch, requestUri)
+        }
+        catch (Exception ex)
         {
-            Content = new StringContent(json, Encoding.UTF8, MediaTypeNames.Application.Json)
+            await Console.Error.WriteLineAsync($"Failed to fetch/deserialize state from Gist: {ex.Message}");
+        }
+
+        return new();
+    }
+
+    private static async Task SaveStateInternal(
+        LastState state,
+        GistOptions options,
+        string userAgent)
+    {
+        Console.WriteLine("Saving state...");
+
+        var stateJson = JsonSerializer.Serialize(state, _jsonOptions);
+        var gistFileUpdate = new GistFileUpdate
+        {
+            Content = stateJson,
         };
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", options.GistToken);
-        request.Headers.UserAgent.ParseAdd(userAgent);
+        var gistUpdate = new GistUpdate();
 
-        using var httpClient = _httpClientFactory.CreateClient();
-        using var response = await httpClient.SendAsync(request);
+        gistUpdate.Files.Add(options.GistStateFileName, gistFileUpdate);
 
-        response.EnsureSuccessStatusCode();
+        var client = GetGitHubClient(options.GistToken, userAgent);
+        await client.Gist.Edit(options.GistId, gistUpdate);
 
         Console.WriteLine("State saved successfully.");
     }
+
+    private static GitHubClient GetGitHubClient(string token, string userAgent)
+    {
+        return new(new ProductHeaderValue(userAgent))
+        {
+            Credentials = new Credentials(token),
+        };
+    }
+    #endregion
 }

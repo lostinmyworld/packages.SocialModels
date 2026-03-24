@@ -14,6 +14,7 @@ public static class BootstrappingExtensions
         services.AddSingleton<IYouTubeConsumer, YouTubeConsumer>();
         services.AddSingleton<IInstagramConsumer, InstagramConsumer>();
         services.AddSingleton<IDiscordSharer, DiscordSharer>();
+        services.AddSingleton<ITwitterSharer, TwitterSharer>();
 
         services.AddHttpClient<YouTubeConsumer>();
         services.AddHttpClient<InstagramConsumer>();
