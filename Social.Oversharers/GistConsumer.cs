@@ -16,17 +16,19 @@ public class GistConsumer : IGistConsumer
         AllowTrailingCommas = true,
     };
 
-    public Task<LastState> LoadPreviousState(
+    public Task<TState> LoadPreviousState<TState>(
         GistOptions options,
         string userAgent = DefaultUserAgent)
+            where TState : class, new()
     {
-        return LoadStateInternal(options, userAgent);
+        return LoadStateInternal<TState>(options, userAgent);
     }
 
-    public async Task<LastState> LoadPreviousState(
+    public async Task<TState> LoadPreviousState<TState>(
         SocialGistOptions socialGistOptions,
         SocialMedia socialMedia,
         string userAgent = DefaultUserAgent)
+            where TState : class, new()
     {
         if (!socialGistOptions.GistPerSocial.TryGetValue(socialMedia, out var options)
             || options is null)
@@ -35,35 +37,38 @@ public class GistConsumer : IGistConsumer
             return new();
         }
 
-        return await LoadStateInternal(options, userAgent);
+        return await LoadStateInternal<TState>(options, userAgent);
     }
 
-    public Task SaveCurrentState(
-        LastState state,
+    public Task SaveCurrentState<TState>(
+        TState state,
         GistOptions options,
         string userAgent = DefaultUserAgent)
+            where TState : class, new()
     {
         return SaveStateInternal(state, options, userAgent);
     }
 
-    public async Task SaveCurrentState(
-        LastState state,
+    public Task SaveCurrentState<TState>(
+        TState state,
         SocialGistOptions socialGistOptions,
         SocialMedia socialMedia,
         string userAgent = DefaultUserAgent)
+            where TState : class, new()
     {
         if (!socialGistOptions.GistPerSocial.TryGetValue(socialMedia, out var options)
             || options is null)
         {
             Console.WriteLine($"Gist not found for social: {socialMedia}...");
-            return;
+            return Task.CompletedTask;
         }
 
-        await SaveStateInternal(state, options, userAgent);
+        return SaveStateInternal(state, options, userAgent);
     }
 
     #region private helpers
-    private static async Task<LastState> LoadStateInternal(GistOptions options, string userAgent)
+    private static async Task<TState> LoadStateInternal<TState>(GistOptions options, string userAgent)
+        where TState : class, new()
     {
         Console.WriteLine("Retrieving state...");
         try
@@ -75,7 +80,7 @@ public class GistConsumer : IGistConsumer
                 && gist.Files.TryGetValue(options.GistStateFileName, out var stateFile)
                 && !string.IsNullOrWhiteSpace(stateFile?.Content))
             {
-                return JsonSerializer.Deserialize<LastState>(stateFile.Content, _jsonOptions)
+                return JsonSerializer.Deserialize<TState>(stateFile.Content, _jsonOptions)
                     ?? new();
             }
         }
@@ -87,10 +92,11 @@ public class GistConsumer : IGistConsumer
         return new();
     }
 
-    private static async Task SaveStateInternal(
-        LastState state,
+    private static async Task SaveStateInternal<TState>(
+        TState state,
         GistOptions options,
         string userAgent)
+            where TState : class, new()
     {
         Console.WriteLine("Saving state...");
 

@@ -32,7 +32,7 @@ var gistOptions = environmentLoader.LoadGistOptions(gistOptionsToRetrieve);
 
 Console.WriteLine("Getting Gist State...");
 
-var state = await gistConsumer.LoadPreviousState(gistOptions!, "test");
+var state = await gistConsumer.LoadPreviousState<dynamic>(gistOptions!, "test");
 
 var instagramToken = Environment.GetEnvironmentVariable("IG_ACCESS_TOKEN");
 

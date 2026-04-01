@@ -5,23 +5,27 @@ namespace Social.Oversharers.Abstractions;
 
 public interface IGistConsumer
 {
-    Task<LastState> LoadPreviousState(
+    Task<TState> LoadPreviousState<TState>(
         GistOptions options,
-        string userAgent = "Social.OverSharers");
+        string userAgent = "Social.OverSharers")
+            where TState: class, new();
 
-    Task<LastState> LoadPreviousState(
+    Task<TState> LoadPreviousState<TState>(
         SocialGistOptions socialGistOptions,
         SocialMedia socialMedia,
-        string userAgent = "Social.OverSharers");
+        string userAgent = "Social.OverSharers")
+            where TState: class, new();
 
-    Task SaveCurrentState(
-        LastState state,
+    Task SaveCurrentState<TState>(
+        TState state,
         GistOptions options,
-        string userAgent = "Social.OverSharers");
+        string userAgent = "Social.OverSharers")
+            where TState : class, new();
 
-    Task SaveCurrentState(
-        LastState state,
+    Task SaveCurrentState<TState>(
+        TState state,
         SocialGistOptions socialGistOptions,
         SocialMedia socialMedia,
-        string userAgent = "Social.OverSharers");
+        string userAgent = "Social.OverSharers")
+            where TState : class, new();
 }
