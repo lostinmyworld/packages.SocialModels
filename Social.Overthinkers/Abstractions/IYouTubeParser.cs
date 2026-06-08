@@ -5,4 +5,5 @@ namespace Social.Overthinkers.Abstractions;
 public interface IYouTubeParser
 {
     YouTubeFeed? DeserializeFeed(string xml);
+    YouTubeVideo? RetrieveOldestVideo(YouTubeFeed? feed, string lastSharedVideoId);
 }

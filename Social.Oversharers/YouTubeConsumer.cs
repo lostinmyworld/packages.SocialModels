@@ -39,4 +39,11 @@ public class YouTubeConsumer : IYouTubeConsumer
 
         return null;
     }
+
+    public async Task<YouTubeVideo?> RetrieveOldestNotSharedVideo(string channelId, string lastSharedVideoId)
+    {
+        var feed = await RetrieveFeed(channelId);
+
+        return _youTubeParser.RetrieveOldestVideo(feed, lastSharedVideoId);
+    }
 }

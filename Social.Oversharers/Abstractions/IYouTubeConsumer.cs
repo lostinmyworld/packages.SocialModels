@@ -5,4 +5,5 @@ namespace Social.Oversharers.Abstractions;
 public interface IYouTubeConsumer
 {
     Task<YouTubeFeed?> RetrieveFeed(string channelId);
+    Task<YouTubeVideo?> RetrieveOldestNotSharedVideo(string channelId, string lastSharedVideoId);
 }
