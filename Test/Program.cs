@@ -19,6 +19,7 @@ Console.WriteLine("Getting dependencies...");
 var environmentLoader = serviceProvider.GetRequiredService<IEnvironmentLoader>();
 var gistConsumer = serviceProvider.GetRequiredService<IGistConsumer>();
 var instaConsumer = serviceProvider.GetRequiredService<IInstagramConsumer>();
+var youtubeConsumer = serviceProvider.GetRequiredService<IYouTubeConsumer>();
 
 Console.WriteLine("Getting envitonment variables...");
 
@@ -38,6 +39,12 @@ var instagramToken = Environment.GetEnvironmentVariable("IG_ACCESS_TOKEN");
 
 var instaRequest = new InstagramRequest(instagramToken!, "insta-watchdog/1.0", HowManyPostsToFetch: 20);
 
-var instaData = await instaConsumer.RetrievePostsAsync(instaRequest);
+//var instaData = await instaConsumer.RetrievePostsAsync(instaRequest);
+
+var youTubeChannelId = Environment.GetEnvironmentVariable("YOUTUBE_CHANNEL_ID")!;
+var youTubeApiKey = Environment.GetEnvironmentVariable("YOUTUBE_API_KEY")!;
+
+var allYouTubeVideos = await youtubeConsumer.RetrieveAllVideos(youTubeChannelId, youTubeApiKey);
+var oldestYouTubeNotShared = await youtubeConsumer.RetrieveOldestNotSharedVideo(youTubeChannelId, youTubeApiKey, null!);
 
 Console.WriteLine("Test success!");

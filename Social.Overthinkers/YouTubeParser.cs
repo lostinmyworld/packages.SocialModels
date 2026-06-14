@@ -15,21 +15,21 @@ public class YouTubeParser : IYouTubeParser
         return (YouTubeFeed?)serializer.Deserialize(reader);
     }
 
-    public YouTubeVideo? RetrieveOldestVideo(YouTubeFeed? feed, string lastSharedVideoId)
+    public YouTubeVideo? RetrieveOldestVideo(List<YouTubeVideo>? videos, string lastSharedVideoId)
     {
-        if (feed?.Entries is null || feed.Entries.Count == 0)
+        if (videos is null || videos.Count == 0)
         {
             return null;
         }
 
         var lastSharedIndex = !string.IsNullOrWhiteSpace(lastSharedVideoId)
-            ? feed.Entries.FindIndex(e => e.HasVideoId(lastSharedVideoId))
+            ? videos.FindIndex(e => e.HasVideoId(lastSharedVideoId))
             : -1;
 
         // no previous videos or not found => return oldest video
         if (lastSharedIndex < 0)
         {
-            return feed.Entries[^1];
+            return videos[^1];
         }
 
         // no new videos, all are shared => nothing to do
@@ -38,6 +38,6 @@ public class YouTubeParser : IYouTubeParser
             return null;
         }
 
-        return feed.Entries[lastSharedIndex - 1];
+        return videos[lastSharedIndex - 1];
     }
 }
