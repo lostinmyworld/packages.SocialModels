@@ -22,14 +22,19 @@ public class YouTubeParser : IYouTubeParser
             return null;
         }
 
-        var lastSharedIndex = !string.IsNullOrWhiteSpace(lastSharedVideoId)
-            ? videos.FindIndex(e => e.HasVideoId(lastSharedVideoId))
-            : -1;
+        if (string.IsNullOrWhiteSpace(lastSharedVideoId))
+        {
+            return videos[^1];
+        }
+
+        var lastSharedIndex = videos.FindIndex(e => e.HasVideoId(lastSharedVideoId));
 
         // no previous videos or not found => return oldest video
         if (lastSharedIndex < 0)
         {
-            return videos[^1];
+            Console.WriteLine($"[WARNING] Last shared ID '{lastSharedVideoId}' not found in the current video list. Halting to prevent restart loop.");
+
+            return null;
         }
 
         // no new videos, all are shared => nothing to do
