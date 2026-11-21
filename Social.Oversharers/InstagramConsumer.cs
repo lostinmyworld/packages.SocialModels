@@ -42,8 +42,7 @@ public class InstagramConsumer : IInstagramConsumer
         using var httpClient = _httpClientFactory.CreateClient(nameof(InstagramConsumer));
         httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(request.App);
 
-        var query = string.Join("&", queryParams.Select(param => $"{Uri.EscapeDataString(param.Key)}={Uri.EscapeDataString(param.Value)}"));
-        var uriToCall = $"{Endpoints.InstagramGraphApiUri}?{query}";
+        var uriToCall = $"{Endpoints.InstagramGraphApiUri}?{BuildQueryString(queryParams)}";
 
         var response = await httpClient.GetStringAsync(uriToCall);
         var deserializedResponse = JsonSerializer.Deserialize<InstagramPostsResponse>(response, JsonExtensions.Options);
@@ -57,5 +56,18 @@ public class InstagramConsumer : IInstagramConsumer
 
         return instagramPosts.OrderByDescending(post => post.TimeOffset)
            .ToList();
+    }
+
+    private static string BuildQueryString(Dictionary<string, string> queryParams)
+    {
+        var encodedParams = queryParams.Select(param =>
+        {
+            var key = Uri.EscapeDataString(param.Key);
+            var value = Uri.EscapeDataString(param.Value);
+
+            return $"{key}={value}";
+        });
+
+        return string.Join("&", encodedParams);
     }
 }
