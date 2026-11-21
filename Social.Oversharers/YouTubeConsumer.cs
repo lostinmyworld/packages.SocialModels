@@ -34,11 +34,13 @@ public class YouTubeConsumer : IYouTubeConsumer
             var youtubeService = new YouTubeService(new BaseClientService.Initializer()
             {
                 ApiKey = apiKey,
-                ApplicationName = "NotAnotherSocialBot"
+                ApplicationName = callerAppName
             });
 
             // Μετατρέπουμε το UC σε UU για να πάρουμε τη λίστα "Uploads"
-            var uploadsPlaylistId = channelId.Replace("UC", "UU");
+            var uploadsPlaylistId = channelId.StartsWith("UC", StringComparison.Ordinal)
+                ? "UU" + channelId[2..]
+                : channelId;
 
             var request = youtubeService.PlaylistItems.List("snippet,contentDetails");
             request.PlaylistId = uploadsPlaylistId;
@@ -71,9 +73,8 @@ public class YouTubeConsumer : IYouTubeConsumer
         catch (Exception ex)
         {
             Console.WriteLine($"Could not retrieve YouTube feed. ChannelId: {channelId}. Message: {ex.Message}");
+            throw;
         }
-
-        return [];
     }
 
     public async Task<YouTubeVideo?> RetrieveOldestNotSharedVideo(
