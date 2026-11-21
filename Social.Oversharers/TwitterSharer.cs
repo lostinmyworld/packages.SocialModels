@@ -1,4 +1,6 @@
-﻿using System.Text.Json;
+﻿using System.Net.Mime;
+using System.Text;
+using System.Text.Json;
 using Social.Models;
 using Social.Models.Twitter;
 using Social.Oversharers.Abstractions;
@@ -28,13 +30,13 @@ public class TwitterSharer : ITwitterSharer
                 credentials.AccessSecret);
 
             var twitterClient = new TwitterClient(twitterCredentials);
-            var jsonBody = JsonSerializer.Serialize(request.Text);
+            var jsonBody = JsonSerializer.Serialize(new { text = request.Text });
 
             var response = await twitterClient.Execute.AdvanceRequestAsync(twitterRequest =>
             {
                 twitterRequest.Query.Url = Endpoints.TwitterV2QueryUrl;
                 twitterRequest.Query.HttpMethod = Tweetinvi.Models.HttpMethod.POST;
-                twitterRequest.Query.HttpContent = new StringContent(jsonBody);
+                twitterRequest.Query.HttpContent = new StringContent(jsonBody, Encoding.UTF8, MediaTypeNames.Application.Json);
             });
 
             var doc = JsonDocument.Parse(response.Content);

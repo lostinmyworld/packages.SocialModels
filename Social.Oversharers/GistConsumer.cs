@@ -87,6 +87,7 @@ public class GistConsumer : IGistConsumer
         catch (Exception ex)
         {
             await Console.Error.WriteLineAsync($"Failed to fetch/deserialize state from Gist: {ex.Message}");
+            throw;
         }
 
         return new();
