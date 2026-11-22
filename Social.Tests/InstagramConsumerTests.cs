@@ -26,7 +26,7 @@ public class InstagramConsumerTests
         await consumer.RetrievePostsAsync(new InstagramRequest("tok en&x", "app/1.0"));
 
         Assert.Equal(
-            "https://graph.instagram.com/me/media?fields=id%2Ccaption%2Cmedia_type%2Cmedia_url%2Cpermalink%2Ctimestamp&limit=20&access_token=tok%20en%26x",
+            "https://graph.instagram.com/me/media?fields=id%2Ccaption%2Cmedia_type%2Cmedia_url%2Cthumbnail_url%2Cpermalink%2Ctimestamp&limit=20&access_token=tok%20en%26x",
             handler.LastRequest?.RequestUri?.OriginalString);
     }
 
@@ -39,6 +39,20 @@ public class InstagramConsumerTests
         var posts = await consumer.RetrievePostsAsync(new InstagramRequest("token", "app/1.0"));
 
         Assert.Equal(["newer", "older"], posts.Select(post => post.Id));
+    }
+
+    [Fact]
+    public async Task RetrievePostsAsync_VideoWithThumbnail_ReturnsThumbnailUrl()
+    {
+        const string videoJson = """
+            { "data": [ { "id": "reel", "media_type": "VIDEO", "thumbnail_url": "https://cdn.example/thumb.jpg" } ] }
+            """;
+        var handler = new FakeHttpMessageHandler(HttpStatusCode.OK, videoJson);
+        var consumer = CreateConsumer(handler);
+
+        var posts = await consumer.RetrievePostsAsync(new InstagramRequest("token", "app/1.0"));
+
+        Assert.Equal("https://cdn.example/thumb.jpg", posts[0].ThumbnailUrl);
     }
 
     [Fact]

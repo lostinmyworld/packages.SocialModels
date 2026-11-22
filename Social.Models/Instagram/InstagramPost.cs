@@ -19,6 +19,9 @@ public class InstagramPost
     [JsonPropertyName("permalink")]
     public string? Permalink { get; set; }
 
+    [JsonPropertyName("thumbnail_url")]
+    public string? ThumbnailUrl { get; set; }
+
     [JsonPropertyName("timestamp")]
     public string? Timestamp { get; set; }
 

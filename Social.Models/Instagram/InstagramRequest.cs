@@ -4,4 +4,4 @@ public record InstagramRequest(
     string Token,
     string App,
     int HowManyPostsToFetch = 20,
-    string InstagramFieldsToRetrieve = "id,caption,media_type,media_url,permalink,timestamp");
+    string InstagramFieldsToRetrieve = "id,caption,media_type,media_url,thumbnail_url,permalink,timestamp");
