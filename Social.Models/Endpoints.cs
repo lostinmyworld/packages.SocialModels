@@ -10,4 +10,7 @@ public static class Endpoints
     public const string YouTubeApiUrl = "https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id={channelId}&key={_apiKey}";
 
     public const string TwitterV2QueryUrl = "https://api.twitter.com/2/tweets";
+
+    public const string ThreadsCreateContainerUri = "https://graph.threads.com/v1.0/me/threads";
+    public const string ThreadsPublishUri = "https://graph.threads.com/v1.0/me/threads_publish";
 }
