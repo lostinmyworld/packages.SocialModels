@@ -10,6 +10,17 @@ public class ThreadsSharer : IThreadsSharer
     private const int DefaultPublishDelaySeconds = 30;
     private const string TextMediaType = "TEXT";
     private const string UnknownError = "unknown error";
+    private const string CreateStep = "create";
+    private const string PublishStep = "publish";
+
+    private static readonly string[] _errorFieldNames =
+    [
+        "message",
+        "error_user_title",
+        "error_user_msg",
+        "code",
+        "error_subcode",
+    ];
 
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly TimeSpan _publishDelay;
@@ -71,7 +82,7 @@ public class ThreadsSharer : IThreadsSharer
             formFields["link_attachment"] = request.LinkUrl;
         }
 
-        return await PostForm(httpClient, Endpoints.ThreadsCreateContainerUri, formFields);
+        return await PostForm(httpClient, CreateStep, Endpoints.ThreadsCreateContainerUri, formFields);
     }
 
     private static async Task<string> PublishContainer(HttpClient httpClient, string containerId, string accessToken)
@@ -82,10 +93,14 @@ public class ThreadsSharer : IThreadsSharer
             ["access_token"] = accessToken,
         };
 
-        return await PostForm(httpClient, Endpoints.ThreadsPublishUri, formFields);
+        return await PostForm(httpClient, PublishStep, Endpoints.ThreadsPublishUri, formFields);
     }
 
-    private static async Task<string> PostForm(HttpClient httpClient, string uri, Dictionary<string, string> formFields)
+    private static async Task<string> PostForm(
+        HttpClient httpClient,
+        string step,
+        string uri,
+        Dictionary<string, string> formFields)
     {
         using var content = new FormUrlEncodedContent(formFields);
         using var response = await httpClient.PostAsync(uri, content);
@@ -94,15 +109,15 @@ public class ThreadsSharer : IThreadsSharer
 
         if (!response.IsSuccessStatusCode)
         {
-            var errorMessage = ReadErrorMessage(responseBody);
-            throw new HttpRequestException($"Threads API returned {(int)response.StatusCode}: {errorMessage}");
+            var errorDetails = ReadErrorDetails(responseBody);
+            throw new HttpRequestException($"Threads API ({step}) returned {(int)response.StatusCode}: {errorDetails}");
         }
 
         var id = ReadId(responseBody);
 
         if (string.IsNullOrWhiteSpace(id))
         {
-            throw new InvalidOperationException("Threads API returned no id.");
+            throw new InvalidOperationException($"Threads API ({step}) returned no id.");
         }
 
         return id;
@@ -124,7 +139,7 @@ public class ThreadsSharer : IThreadsSharer
         }
     }
 
-    private static string ReadErrorMessage(string responseBody)
+    private static string ReadErrorDetails(string responseBody)
     {
         try
         {
@@ -132,16 +147,45 @@ public class ThreadsSharer : IThreadsSharer
 
             var hasError = document.RootElement.TryGetProperty("error", out var errorElement);
 
-            if (!hasError || !errorElement.TryGetProperty("message", out var messageElement))
+            if (!hasError || errorElement.ValueKind != JsonValueKind.Object)
             {
                 return UnknownError;
             }
 
-            return messageElement.GetString() ?? UnknownError;
+            var details = new List<string>();
+
+            foreach (var fieldName in _errorFieldNames)
+            {
+                var fieldValue = ReadFieldAsText(errorElement, fieldName);
+
+                if (!string.IsNullOrWhiteSpace(fieldValue))
+                {
+                    details.Add($"{fieldName}: {fieldValue}");
+                }
+            }
+
+            return details.Count == 0
+                ? UnknownError
+                : string.Join(" | ", details);
         }
         catch (JsonException)
         {
             return UnknownError;
         }
+    }
+
+    private static string? ReadFieldAsText(JsonElement element, string fieldName)
+    {
+        if (!element.TryGetProperty(fieldName, out var fieldElement))
+        {
+            return null;
+        }
+
+        return fieldElement.ValueKind switch
+        {
+            JsonValueKind.String => fieldElement.GetString(),
+            JsonValueKind.Number => fieldElement.GetRawText(),
+            _ => null,
+        };
     }
 }

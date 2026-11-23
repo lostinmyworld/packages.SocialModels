@@ -71,7 +71,7 @@ public class ThreadsSharerTests
         var response = await sharer.SharePost(new ThreadsPostRequest(Token, "hello"));
 
         Assert.False(response.IsSuccess);
-        Assert.Equal("Threads API returned 400: Invalid OAuth access token.", response.ErrorMessage);
+        Assert.Equal("Threads API (create) returned 400: message: Invalid OAuth access token.", response.ErrorMessage);
     }
 
     [Fact]
@@ -83,7 +83,7 @@ public class ThreadsSharerTests
         var response = await sharer.SharePost(new ThreadsPostRequest(Token, "hello"));
 
         Assert.False(response.IsSuccess);
-        Assert.Equal("Threads API returned 500: unknown error", response.ErrorMessage);
+        Assert.Equal("Threads API (create) returned 500: unknown error", response.ErrorMessage);
     }
 
     [Fact]
@@ -96,7 +96,7 @@ public class ThreadsSharerTests
         var response = await sharer.SharePost(new ThreadsPostRequest(Token, "hello"));
 
         Assert.False(response.IsSuccess);
-        Assert.Equal("Threads API returned 400: Media not ready.", response.ErrorMessage);
+        Assert.Equal("Threads API (publish) returned 400: message: Media not ready.", response.ErrorMessage);
     }
 
     [Fact]
@@ -108,7 +108,35 @@ public class ThreadsSharerTests
         var response = await sharer.SharePost(new ThreadsPostRequest(Token, "hello"));
 
         Assert.False(response.IsSuccess);
-        Assert.Equal("Threads API returned no id.", response.ErrorMessage);
+        Assert.Equal("Threads API (create) returned no id.", response.ErrorMessage);
+    }
+
+    [Fact]
+    public async Task SharePost_ErrorWithAllDetails_ReturnsEveryDetail()
+    {
+        var errorJson = """{"error":{"message":"Fatal","error_user_title":"Media error","error_user_msg":"Link not allowed","code":1,"error_subcode":2207052}}""";
+        var handler = new SequenceHttpMessageHandler((HttpStatusCode.BadRequest, errorJson));
+        var sharer = CreateSharer(handler);
+
+        var response = await sharer.SharePost(new ThreadsPostRequest(Token, "hello"));
+
+        Assert.Equal(
+            "Threads API (create) returned 400: message: Fatal | error_user_title: Media error | error_user_msg: Link not allowed | code: 1 | error_subcode: 2207052",
+            response.ErrorMessage);
+    }
+
+    [Theory]
+    [InlineData("""{"error":{}}""")]
+    [InlineData("""{"error":"text"}""")]
+    [InlineData("""{"error":{"code":null}}""")]
+    public async Task SharePost_ErrorWithoutKnownDetails_ReturnsUnknownError(string errorJson)
+    {
+        var handler = new SequenceHttpMessageHandler((HttpStatusCode.BadRequest, errorJson));
+        var sharer = CreateSharer(handler);
+
+        var response = await sharer.SharePost(new ThreadsPostRequest(Token, "hello"));
+
+        Assert.Equal("Threads API (create) returned 400: unknown error", response.ErrorMessage);
     }
 
     [Theory]
