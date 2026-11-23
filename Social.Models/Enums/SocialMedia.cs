@@ -11,4 +11,5 @@ public enum SocialMedia
     Instagram,
     TikTok,
     YouTube,
+    Threads,
 }

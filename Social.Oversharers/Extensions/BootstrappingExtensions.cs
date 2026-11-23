@@ -15,10 +15,12 @@ public static class BootstrappingExtensions
         services.AddSingleton<IInstagramConsumer, InstagramConsumer>();
         services.AddSingleton<IDiscordSharer, DiscordSharer>();
         services.AddSingleton<ITwitterSharer, TwitterSharer>();
+        services.AddSingleton<IThreadsSharer, ThreadsSharer>();
 
         services.AddHttpClient<YouTubeConsumer>();
         services.AddHttpClient<InstagramConsumer>();
         services.AddHttpClient<DiscordSharer>();
+        services.AddHttpClient<ThreadsSharer>();
 
         return services;
     }
