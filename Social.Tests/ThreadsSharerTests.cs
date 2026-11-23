@@ -50,6 +50,45 @@ public class ThreadsSharerTests
     }
 
     [Fact]
+    public async Task SharePost_WithImage_CreatesImageContainer()
+    {
+        var handler = new SequenceHttpMessageHandler((HttpStatusCode.OK, ContainerJson), (HttpStatusCode.OK, PublishedJson));
+        var sharer = CreateSharer(handler);
+
+        await sharer.SharePost(new ThreadsPostRequest(Token, "hello", ImageUrl: "https://cdn.example/image.jpg"));
+
+        Assert.Equal(
+            "media_type=IMAGE&text=hello&access_token=threads-token&image_url=https%3A%2F%2Fcdn.example%2Fimage.jpg",
+            handler.RequestBodies[0]);
+    }
+
+    [Fact]
+    public async Task SharePost_WithImageAndLink_SendsImageWithoutLinkAttachment()
+    {
+        var handler = new SequenceHttpMessageHandler((HttpStatusCode.OK, ContainerJson), (HttpStatusCode.OK, PublishedJson));
+        var sharer = CreateSharer(handler);
+
+        await sharer.SharePost(new ThreadsPostRequest(Token, "hello", "https://example.com/post", "https://cdn.example/image.jpg"));
+
+        Assert.Equal(
+            "media_type=IMAGE&text=hello&access_token=threads-token&image_url=https%3A%2F%2Fcdn.example%2Fimage.jpg",
+            handler.RequestBodies[0]);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData(" ")]
+    public async Task SharePost_WithBlankImage_CreatesTextContainer(string imageUrl)
+    {
+        var handler = new SequenceHttpMessageHandler((HttpStatusCode.OK, ContainerJson), (HttpStatusCode.OK, PublishedJson));
+        var sharer = CreateSharer(handler);
+
+        await sharer.SharePost(new ThreadsPostRequest(Token, "hello", ImageUrl: imageUrl));
+
+        Assert.Equal("media_type=TEXT&text=hello&access_token=threads-token", handler.RequestBodies[0]);
+    }
+
+    [Fact]
     public async Task SharePost_ContainerCreated_PublishesThatContainer()
     {
         var handler = new SequenceHttpMessageHandler((HttpStatusCode.OK, ContainerJson), (HttpStatusCode.OK, PublishedJson));
