@@ -9,6 +9,7 @@ public class ThreadsSharer : IThreadsSharer
 {
     private const int DefaultPublishDelaySeconds = 30;
     private const string TextMediaType = "TEXT";
+    private const string ImageMediaType = "IMAGE";
     private const string UnknownError = "unknown error";
     private const string CreateStep = "create";
     private const string PublishStep = "publish";
@@ -70,14 +71,21 @@ public class ThreadsSharer : IThreadsSharer
 
     private static async Task<string> CreateContainer(HttpClient httpClient, ThreadsPostRequest request)
     {
+        var hasImage = !string.IsNullOrWhiteSpace(request.ImageUrl);
+        var mediaType = hasImage ? ImageMediaType : TextMediaType;
+
         var formFields = new Dictionary<string, string>
         {
-            ["media_type"] = TextMediaType,
+            ["media_type"] = mediaType,
             ["text"] = request.Text,
             ["access_token"] = request.AccessToken,
         };
 
-        if (!string.IsNullOrWhiteSpace(request.LinkUrl))
+        if (hasImage)
+        {
+            formFields["image_url"] = request.ImageUrl!;
+        }
+        else if (!string.IsNullOrWhiteSpace(request.LinkUrl))
         {
             formFields["link_attachment"] = request.LinkUrl;
         }

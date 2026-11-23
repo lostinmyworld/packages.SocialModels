@@ -3,4 +3,5 @@
 public record ThreadsPostRequest(
     string AccessToken,
     string Text,
-    string? LinkUrl = null);
+    string? LinkUrl = null,
+    string? ImageUrl = null);
